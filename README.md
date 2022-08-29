@@ -1,5 +1,5 @@
-# telegraf-cgroup
-Cgroup script for Telegraf. Alternative to procstat plugin. It doesn't need to be run as root but may requires appropriate sudoers instead.
+# Cgroup metrics
+Cgroup metrics using influx format. May be used with Telegraf as an alternative of the procstat plugin. It doesn't need to be run as root but may requires appropriate sudoers instead.
 
 # Usage
 ```
@@ -32,7 +32,7 @@ Returns values as influx format
 |io_write_bytes|/proc/PID/io|yes|
 |io_cancelled_write_bytes|/proc/PID/io|yes|
 
-# Implementation
+# Implementation with Telegraf
 Sudo configuration:
 ```
 telegraf ALL=(root) NOPASSWD: /usr/bin/ls /proc/*, /usr/bin/cat /proc/*
