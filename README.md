@@ -31,6 +31,8 @@ Returns values as influx format
 |io_read_bytes|/proc/PID/io|yes|
 |io_write_bytes|/proc/PID/io|yes|
 |io_cancelled_write_bytes|/proc/PID/io|yes|
+|cpu_time|/proc/PID/stat|no|
+|cpu_time_children|/proc/PID/stat|no|
 
 # Implementation with Telegraf
 Sudo configuration:
