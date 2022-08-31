@@ -33,6 +33,9 @@ io_wchar=0
 io_read_bytes=0
 io_write_bytes=0
 io_cancelled_write_bytes=0
+hertz=$(getconf CLK_TCK)
+cpu_time=0
+cpu_time_children=0
 
 for i in $(cat $folder/cgroup.procs); do
   tmp_stat=$(cat "/proc/$i/stat" 2>/dev/null;)
@@ -46,6 +49,10 @@ for i in $(cat $folder/cgroup.procs); do
   tmp_io=$($prefixsudo cat "/proc/$i/io" 2>/dev/null)
   [ "$?" -ne "0" ] && break
 
+  tmp_stat_utime=$(echo $tmp_stat | cut -d ' ' -f 14)
+  tmp_stat_stime=$(echo $tmp_stat | cut -d ' ' -f 15)
+  tmp_stat_cutime=$(echo $tmp_stat | cut -d ' ' -f 16)
+  tmp_stat_cstime=$(echo $tmp_stat | cut -d ' ' -f 17)
   tmp_stat_numthread=$(echo $tmp_stat | cut -d ' ' -f 20)
   tmp_stat_vsize=$(echo $tmp_stat | cut -d ' ' -f 23)
   tmp_stat_rss=$(echo $tmp_stat | cut -d ' ' -f 24)
@@ -81,8 +88,10 @@ for i in $(cat $folder/cgroup.procs); do
   ((io_read_bytes=io_read_bytes+tmp_io_read_bytes))
   ((io_write_bytes=io_write_bytes+tmp_io_write_bytes))
   ((io_cancelled_write_bytes=io_cancelled_write_bytes+tmp_io_cancelled_write_bytes))
+  ((cpu_time=cpu_time+(tmp_stat_utime+tmp_stat_stime)/hertz))
+  ((cpu_time_children=cpu_time_children+(tmp_stat_utime+tmp_stat_stime+tmp_stat_cutime+tmp_stat_cstime)/hertz))
 done
 
-echo "cgroup,name=$2 num_process=${numprocess}i,num_thread=${stat_numthread}i,memory_rss=${stat_rss}i,memory_vsize=${stat_vsize}i,memory_shared=${statm_shared}i,memory_rss_anon=${status_rss_anon}i,memory_rss_file=${status_rss_file}i,memory_rss_shared=${status_rss_shared}i,memory_data=${status_data}i,memory_stack=${status_stack}i,memory_exe=${status_exe}i,memory_lib=${status_lib}i,num_fd=${fdnum}i,io_rchar=${io_rchar}i,io_wchar=${io_wchar}i,io_read_bytes=${io_read_bytes}i,io_write_bytes=${io_write_bytes}i,io_cancelled_write_bytes=${io_cancelled_write_bytes}i"
+echo "cgroup,name=$2 num_process=${numprocess}i,num_thread=${stat_numthread}i,memory_rss=${stat_rss}i,memory_vsize=${stat_vsize}i,memory_shared=${statm_shared}i,memory_rss_anon=${status_rss_anon}i,memory_rss_file=${status_rss_file}i,memory_rss_shared=${status_rss_shared}i,memory_data=${status_data}i,memory_stack=${status_stack}i,memory_exe=${status_exe}i,memory_lib=${status_lib}i,num_fd=${fdnum}i,io_rchar=${io_rchar}i,io_wchar=${io_wchar}i,io_read_bytes=${io_read_bytes}i,io_write_bytes=${io_write_bytes}i,io_cancelled_write_bytes=${io_cancelled_write_bytes}i,cpu_time=${cpu_time}i,cpu_time_children=${cpu_time_children}i"
 
 exit 0
