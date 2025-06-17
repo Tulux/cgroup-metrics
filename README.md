@@ -3,8 +3,7 @@ Cgroup metrics using influx format. May be used with Telegraf as an alternative 
 
 # Usage
 ```
-Usage: cgroup.sh <sudo_flag> <cgroup_name>
-sudo_flag: must be set to "sudo" to access root-only files using sudo, any other value will disable sudo usage
+Usage: Usage: cgroup.sh <cgroup_name1> [<cgroup_name2> ...]
 cgroup_name: full cgroup name as listed in /sys/fs/cgroup
 
 Returns values as influx format
@@ -37,12 +36,12 @@ Returns values as influx format
 # Implementation with Telegraf
 Sudo configuration:
 ```
-telegraf ALL=(root) NOPASSWD: /usr/bin/ls /proc/*, /usr/bin/cat /proc/*
+telegraf ALL=(root) NOPASSWD: /bin/bash /path/to/script/cgroup.sh *
 ```
 Telegraf configuration:
 ```
 [[inputs.exec]]
-  commands = ["sh /usr/lib/telegraf/plugins/cgroup.sh sudo systemd/system.slice/nginx.service"]
+  commands = ["sudo bash /usr/lib/telegraf/plugins/cgroup.sh system.slice/nginx.service system.slice/fail2ban.service"]
   timeout = "5s"
   data_format = "influx"
 ```
